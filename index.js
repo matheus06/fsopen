@@ -1,9 +1,11 @@
 const express = require('express')
 const app = express()
 const bodyParser = require('body-parser')
-var morgan = require('morgan')
+const morgan = require('morgan')
+const cors = require('cors')
 
 app.use(bodyParser.json())
+app.use(cors())
 
 morgan.token('body', function(req, res) {
   if (req.method == "POST") {
@@ -48,6 +50,13 @@ app.get('/api/persons/:id', (req, res) => {
   res.json(person)
 })
 
+app.put('/api/persons/:id', (req, res) => {
+  const id = Number(req.params.id)
+  var foundIndex = persons.findIndex(x => x.id === id);
+  persons[foundIndex].number = req.body.number;
+  res.status(200).end()
+})
+
 app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id)
   persons = persons.filter(person => person.id !== id)
@@ -84,7 +93,8 @@ app.post('/api/persons', (req, res) => {
   }
 
   persons = persons.concat(person)
-
+  
+  res.json(person)
   res.status(201).end()
 })
 
