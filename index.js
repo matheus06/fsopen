@@ -3,6 +3,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const cors = require('cors')
+const Person = require('./models/person')
 
 app.use(bodyParser.json())
 app.use(cors())
@@ -12,6 +13,7 @@ morgan.token('body', function(req, res) {
     return JSON.stringify(req.body);
   }
 });
+
 
 app.use(morgan(':method :status :res[content-length] - :response-time ms :body' ))
 
@@ -42,7 +44,7 @@ let persons = [
 ]
 
 app.get('/api/persons', (req, res) => {
-  res.json(persons)
+  Person.find({}).then(persons => res.json(persons))
 })
 
 app.get('/api/persons/:id', (req, res) => {
@@ -87,16 +89,15 @@ app.post('/api/persons', (req, res) => {
     })
   }
 
-  const person = {
+  const person = new Person({
     name: req.body.name,
-    number: req.body.number,
-    id: generateId()
-  }
+    number: req.body.number
+  })
 
-  persons = persons.concat(person)
-  
-  res.json(person)
-  res.status(201).end()
+  person.save().then(savedPerson => {
+    res.json(savedPerson)
+    res.status(201).end()
+  })  
 })
 
 app.get('/info', (req, res) => {
