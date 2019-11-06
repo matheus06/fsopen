@@ -1,7 +1,8 @@
 const mongoose = require('mongoose')
+var uniqueValidator = require('mongoose-unique-validator');
 
 const url =
-    `mongodb+srv://fullstack:@fullstackopencluster-2qzax.azure.mongodb.net/phonebook-app?retryWrites=true&w=majority`
+    `mongodb+srv://fullstack:123qwe@fullstackopencluster-2qzax.azure.mongodb.net/phonebook-app?retryWrites=true&w=majority`
 
 mongoose.connect(url, { useUnifiedTopology: true, useNewUrlParser: true })
     .then(result => {
@@ -12,9 +13,11 @@ mongoose.connect(url, { useUnifiedTopology: true, useNewUrlParser: true })
     })
 
 const phonebookSchema = new mongoose.Schema({
-    name: String,
-    number: String
+    name: { type: String, required: true, unique: true, minlength: 3 },
+    number: { type: String,  minlength: 8 }
 })
+
+phonebookSchema.plugin(uniqueValidator)
 
 phonebookSchema.set('toJSON', {
     transform: (document, returnedObject) => {
